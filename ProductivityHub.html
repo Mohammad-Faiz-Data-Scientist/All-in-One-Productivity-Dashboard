@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8" />
@@ -24,6 +24,15 @@
               --chip: #E9ECEF;
               --border: #DEE2E6;
               --icon: #6C757D;
+
+              /* Variables for card highlight */
+              --pulse-color-card-start: rgba(52, 152, 219, 0.5);
+              --pulse-color-card-end: rgba(52, 152, 219, 0.9);
+
+              /* NEW/REFINED variables for specific item highlight (task/event) */
+              --pulse-color-item-initial: rgba(0, 123, 255, 0.3); /* Very light initial border/shadow */
+              --pulse-color-item-glow: rgba(0, 123, 255, 1);    /* Full color for the glow peak */
+              --pulse-background-item: rgba(0, 123, 255, 0.1);  /* Subtle background flash */
           }
 
           [data-theme="dark"] {
@@ -42,12 +51,21 @@
               --md: #F39C12;
               --hi: #E74C3C;
               --icon: #BDC3C7;
+
+              /* Variables for dark theme card highlight */
+              --pulse-color-card-start: rgba(110, 168, 254, 0.5);
+              --pulse-color-card-end: rgba(110, 168, 254, 0.9);
+
+              /* NEW/REFINED variables for dark theme specific item highlight */
+              --pulse-color-item-initial: rgba(110, 168, 254, 0.3);
+              --pulse-color-item-glow: rgba(110, 168, 254, 1);
+              --pulse-background-item: rgba(110, 168, 254, 0.2);
           }
 
           * {
               box-sizing: border-box;
               font-family: 'Roboto', sans-serif;
-              transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+              transition: background-color 0.3s, color 0.3s, box-shadow 0.3s, border-color 0.3s, transform 0.3s;
           }
 
           body {
@@ -72,7 +90,7 @@
           }
 
           h1 {
-              margin: 0 0 20px;
+              margin: 0 0 25px;
               text-align: center;
               color: var(--brand);
               font-size: clamp(24px, 5vw, 32px);
@@ -142,24 +160,43 @@
           }
           
           .card.highlight {
-              box-shadow: 0 0 15px 5px var(--brand);
-              animation: pulse 1s infinite alternate;
+              box-shadow: 0 0 10px 3px var(--pulse-color-card-start);
+              animation: pulse-card-glow 1.5s ease-in-out infinite alternate;
+              transform-origin: center;
           }
 
+          /* --- Specific Item (Task/Event) Highlighting --- */
           .highlight-item {
-              box-shadow: 0 0 8px 3px var(--warn) !important;
-              animation: pulse-warn 1s infinite alternate;
+              /* Animation is applied to border and box-shadow */
+              animation: pulse-item-glow 1.8s ease-in-out infinite alternate !important;
           }
           
-          @keyframes pulse {
-              from { box-shadow: 0 0 15px 5px rgba(52, 152, 219, 0.7); }
-              to { box-shadow: 0 0 20px 8px rgba(52, 152, 219, 0.9); }
+          @keyframes pulse-card-glow {
+              from {
+                  box-shadow: 0 0 10px 3px var(--pulse-color-card-start);
+                  transform: scale(1);
+              }
+              to {
+                  box-shadow: 0 0 20px 8px var(--pulse-color-card-end);
+                  transform: scale(1.01);
+              }
           }
 
-          @keyframes pulse-warn {
-              from { box-shadow: 0 0 8px 3px rgba(241, 196, 15, 0.7) !important; }
-              to { box-shadow: 0 0 12px 5px rgba(241, 196, 15, 0.9) !important; }
+          @keyframes pulse-item-glow {
+              from {
+                  border-color: var(--pulse-color-item-initial) !important;
+                  box-shadow: 0 0 2px 0px var(--pulse-color-item-initial) !important;
+                  background-color: var(--chip);
+                  transform: scale(1);
+              }
+              to {
+                  border-color: var(--pulse-color-item-glow) !important;
+                  box-shadow: 0 0 10px 0px var(--pulse-color-item-glow) !important;
+                  background-color: var(--pulse-background-item);
+                  transform: scale(1);
+              }
           }
+          /* ----------------------------------------------- */
           
           .card h2 {
               margin: 0 0 15px;
@@ -251,7 +288,7 @@
               color: var(--text) !important;
           }
           
-          .task-input, .event-input {
+          .task-input {
               display: grid;
               grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
               gap: 10px;
@@ -263,6 +300,7 @@
               gap: 10px;
               align-items: center;
               flex-wrap: wrap;
+              margin-bottom: 15px;
           }
 
           .task-input-row-2 > * {
@@ -312,9 +350,10 @@
               align-items: center;
               background: var(--chip);
               padding: 12px;
-              border-radius: 10px;
+              border-radius: 10px; /* IMPORTANT: Ensures box-shadow and border follow this */
               border: 1px solid var(--border);
               overflow: hidden;
+              transition: box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
           }
           
           li.task .task-actions {
@@ -371,6 +410,7 @@
               text-decoration: line-through;
           }
           
+          /* RESTORED original event-card styles */
           .event-card {
               padding: 15px;
               border-left: 5px solid var(--brand);
@@ -381,12 +421,20 @@
               display: flex;
               align-items: center;
               justify-content: space-between;
+              transition: box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
           }
           
           .event-details {
               flex: 1;
           }
           
+          .event-input {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+              gap: 10px;
+              margin-bottom: 15px;
+          }
+
           .event-list-container {
               max-height: 400px;
               overflow-y: auto;
@@ -714,7 +762,7 @@
                             <button class="btn delete-btn" id="stopSoundBtn" style="display:none;"><span class="material-symbols-outlined">volume_off</span></button>
                         </div>
                         <div style="width:100%; margin-top:15px;">
-                            <input type="text" id="sessionPurpose" placeholder="What are you working on?" />
+                            <input type="text" id="sessionPurpose" placeholder="What are you working on?" autocomplete="off"/>
                         </div>
                     </div>
                 </div>
@@ -724,34 +772,34 @@
                 <div class="card todo-card">
                     <h2>To-Do List</h2>
                     <div class="task-input">
-                        <input type="text" id="taskTitle" placeholder="Task title"/>
+                        <input type="text" id="taskTitle" placeholder="Task title" autocomplete="off"/>
                         <div class="select-wrapper">
-                            <select id="taskPriorityDropdown">
+                            <select id="taskPriorityDropdown" autocomplete="off">
                                 <option value="High">High</option>
                                 <option value="Medium" selected>Medium</option>
                                 <option value="Low">Low</option>
                             </select>
                         </div>
-                        <input type="text" id="taskSubject" placeholder="Subject / Category"/>
+                        <input type="text" id="taskSubject" placeholder="Subject / Category" autocomplete="off"/>
                         <div class="input-with-icon">
-                            <input type="text" id="taskDue" placeholder="Select date"/>
+                            <input type="text" id="taskDue" placeholder="Select date" autocomplete="off"/>
                             <span class="material-symbols-outlined">calendar_month</span>
                         </div>
                         <div class="input-with-icon">
-                            <input type="text" id="taskTime" placeholder="Select time"/>
+                            <input type="text" id="taskTime" placeholder="Select time" autocomplete="off"/>
                             <span class="material-symbols-outlined">schedule</span>
                         </div>
                         <button class="btn mode-btn" id="addTaskBtn"><span class="material-symbols-outlined">add</span> Add</button>
                     </div>
                     <div class="task-input-row-2">
                         <div class="select-wrapper">
-                            <select id="taskSortDropdown">
+                            <select id="taskSortDropdown" autocomplete="off">
                                 <option value="priority">Sort by Priority</option>
                                 <option value="due">Sort by Due Date</option>
                                 <option value="created">Sort by Created</option>
                             </select>
                         </div>
-                        <input type="text" id="taskSearch" placeholder="Search tasks…"/>
+                        <input type="text" id="taskSearch" placeholder="Search tasks…" autocomplete="off"/>
                     </div>
                     <div id="taskListContainer" class="todo-list-container">
                         <ul id="taskList"></ul>
@@ -764,13 +812,13 @@
             <div class="card event-card-container">
                 <h2>Countdown Events</h2>
                 <div class="event-input">
-                    <input type="text" id="eventName" placeholder="Event name"/>
+                    <input type="text" id="eventName" placeholder="Event name" autocomplete="off"/>
                     <div class="input-with-icon">
-                        <input type="text" id="eventDate" placeholder="Select date"/>
+                        <input type="text" id="eventDate" placeholder="Select date" autocomplete="off"/>
                         <span class="material-symbols-outlined">calendar_month</span>
                     </div>
                     <div class="input-with-icon">
-                        <input type="text" id="eventTime" placeholder="Select time"/>
+                        <input type="text" id="eventTime" placeholder="Select time" autocomplete="off"/>
                         <span class="material-symbols-outlined">schedule</span>
                     </div>
                     <button class="btn mode-btn" id="addEventBtn"><span class="material-symbols-outlined">add</span> Add</button>
@@ -832,8 +880,8 @@
     </div>
     
     <audio id="timerEndSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
-    <audio id="todoAlarmSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" preload="auto"></audio>
-    <audio id="eventAlarmSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" preload="auto"></audio>
+    <audio id="todoAlarmSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" preload="auto"></audio>
+    <audio id="eventAlarmSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3" preload="auto"></audio>
     
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
